@@ -1,2 +1,2 @@
 # HeraldLight
-HeraldLight predicts future traffic flow to enable resonable duration selection
+This is the code for HeraldLight.

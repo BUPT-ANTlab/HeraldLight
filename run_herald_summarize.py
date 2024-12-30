@@ -61,11 +61,9 @@ def main(in_args=None):
                              "anon_3_4_jinan_real_2500.json"]
         num_rounds = 200
         template = "Jinan"
-        # 参数中默认传递的是这个地图
     elif args.newyork2:
         count, count2 = 3600, 3600
         road_net, num_lanes, num_lane = "28_7", [3, 3, 3, 3], 12
-        # phasemap是什么意思
         phase_map = [[1, 4], [7, 10], [0, 3], [6, 9]]
         traffic_file_list = ["anon_28_7_newyork_real_triple.json", "anon_28_7_newyork_real_double.json"]
         num_rounds = 80

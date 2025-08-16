@@ -40,6 +40,7 @@ class Intersection:
             approach in self.list_approachs}
         self.list_phases = dic_traffic_env_conf["PHASE"]
 
+
         # generate all lanes
         self.list_entering_lanes = []
         for (approach, lane_number) in zip(self.list_approachs, dic_traffic_env_conf["NUM_LANES"]):
@@ -737,6 +738,7 @@ class CityFlowEnv:
 
         self.actions_static = [-1 for i in range(self.num_intersection)]
         self.vehicle_pass_num_duration_left_for_herald = {inter: [] for inter in range(self.num_intersection)}
+        self.fix_vehicle_pass_num_duration_left_for_herald = {inter: [] for inter in range(self.num_intersection)}
 
         self.list_gpt_history = None
         # check min action time
@@ -974,6 +976,7 @@ class CityFlowEnv:
         if action1 != []:
             for index, inter_id in enumerate(self.list_need_action):
                 self.actions_static[inter_id] = action2[index]
+                self.fix_vehicle_pass_num_duration_left_for_herald[inter_id] = {}
 
         if self.need_5yellow_index != []:
             for index, idx in enumerate(self.need_5yellow_index):
@@ -1259,11 +1262,12 @@ class CityFlowEnv:
                               }
 
 
-        for inter in self.list_intersection:
+
+        for index, inter in enumerate(self.list_intersection):
             list_vehicle_new_left = inter.update_current_measurements(self.system_states)
             if list_vehicle_new_left != [] and inter.current_phase_index != 999:
                 for vehicle_id in list_vehicle_new_left:
-                    print('inter.current_phase_index - 1', inter.current_phase_index - 1)
+                    #print('inter.current_phase_index - 1', inter.current_phase_index - 1)
                     current_phase_map_this_inter = self.dic_traffic_env_conf['PHASE_MAP'][inter.current_phase_index - 1]
                     phase_controled_lane1 = list(inter.dic_lane_vehicle_previous_step_in.keys())[
                         current_phase_map_this_inter[0]]
@@ -1272,7 +1276,13 @@ class CityFlowEnv:
                     merged_lane_flow = inter.dic_lane_vehicle_previous_step_in[phase_controled_lane1] + inter.dic_lane_vehicle_previous_step_in[phase_controled_lane2]
 
                     if vehicle_id in merged_lane_flow:
-                        vehicle_pass_num_duration_left[self.id_to_index[inter.inter_name]].append({f"{vehicle_id}": inter.current_phase_duration}) #current_phase_duration
+                        vehicle_pass_num_duration_left[index].append({f"{vehicle_id}": inter.current_phase_duration}) #current_phase_duration
+
+                    if vehicle_id in inter.dic_lane_vehicle_previous_step_in[phase_controled_lane1]:
+                        if phase_controled_lane1 not in self.fix_vehicle_pass_num_duration_left_for_herald[index]:
+                            self.fix_vehicle_pass_num_duration_left_for_herald[index][phase_controled_lane1] = [{vehicle_id: inter.current_phase_duration}]
+                        else:
+                            self.fix_vehicle_pass_num_duration_left_for_herald[index][phase_controled_lane1].append({vehicle_id: inter.current_phase_duration})
 
             vehicle_pass_num[self.id_to_index[inter.inter_name]] += len(list_vehicle_new_left)
 

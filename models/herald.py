@@ -1,11 +1,6 @@
-"""
-Max-Pressure agent.
-observation: [traffic_movement_pressure_queue].
-Action: use greedy method select the phase with max value.
-"""
-
 from .agent import Agent
 import random
+from collections import defaultdict
 import numpy as np
 
 
@@ -21,6 +16,7 @@ class heraldagent(Agent):
         self.last_queue_num = [0 for i in range(self.dic_traffic_env_conf['NUM_INTERSECTIONS'])]
         self.action = None
         self.first_time = True
+        self.flow_length_stats = defaultdict(lambda: defaultdict(int))
         self.queue2duration = {
             0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5,
             6: 6, 7: 7, 8: 8, 9: 9,
@@ -125,6 +121,17 @@ class heraldagent(Agent):
 
         self.last_step_list_need = list_need
         print(self.queue2duration)
+
+        self.queue2duration_new = {
+            key: max(value_list, key=lambda x: x["count"])["duration"]
+            for key, value_list in self.format_stats(self.flow_length_stats).items()
+        }
+        print("↓" * 10)
+        print("Method 1", self.queue2duration)
+        print("Method 2", self.format_stats(self.flow_length_stats))
+        print("Method 2.1", self.queue2duration_new)
+        print("↑" * 10)
+
         return pactions, dactions
 
 
@@ -151,7 +158,22 @@ class heraldagent(Agent):
             phase_queue_origins.append(phase_origin)
 
         return phase_queue_sums, phase_queue_origins
+    def format_stats(self, raw_stats):
+        formatted = {}
+        for pos, time_counts in raw_stats.items():
+            formatted[pos] = [
+                {"duration": time, "count": count}
+                for time, count in time_counts.items()
+            ]
+        return formatted
 
+    def accumulate_flow_stats(self, data, stats):
+        for entry in data.values():
+            if entry != []:
+                for road in entry.values():
+                    for position, flow in enumerate(road, start=1):
+                        time = list(flow.values())[0]
+                        stats[position][time] += 1
 
     def choose_max_sublist(self, arrays):
 

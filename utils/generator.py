@@ -130,6 +130,8 @@ class Generator:
                         phase_action, duration_action = self.agents[i].choose_action(state, list_need, self.env.list_intersection, self.env.list_gpt_history)
 
                 elif self.dic_traffic_env_conf['MODEL_NAME'] == 'herald':
+                    self.agents[i].accumulate_flow_stats(self.env.fix_vehicle_pass_num_duration_left_for_herald,
+                                                         self.agents[i].flow_length_stats)
                     phase_action, duration_action = self.agents[i].choose_action(state, list_need, self.env.list_intersection,self.env.actions_static, self.env.vehicle_pass_num_duration_left_for_herald,step_time)
 
                 else:

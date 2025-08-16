@@ -45,7 +45,7 @@ python run_gpt.py
 
 ## 5 LoRA-based Imitation Fine-tuning
 
-**Step 1.** Fine-tuning scripts are located in `./finetune/*` (your repository may use `./fintune/*`).
+**Step 1.** Fine-tuning scripts are located in `./finetune/*`.
 
 ```shell
 python fintune/finetune_new.py

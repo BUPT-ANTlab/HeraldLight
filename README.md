@@ -51,7 +51,7 @@ python run_gpt.py
 python fintune/finetune_new.py
 ```
 
-If required, merge LoRA weights after fine-tuning:
+**Step 2.** Merge LoRA weights after fine-tuning:
 
 ```shell
 python fintune/merge_new_lora.py

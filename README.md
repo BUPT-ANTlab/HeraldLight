@@ -79,7 +79,7 @@ python fintune/RankTrainer/Trainer.py
 ```
 
 
-## 7. Prompt instance
+## 7. Prompt Instance
 
 | HeraldLight Prompt Template|
 |---|
